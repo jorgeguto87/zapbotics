@@ -55,7 +55,7 @@ const client = new Client ({
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     client.on('message', async msg => {
-        if (msg.body.match (/(Bot)/i) && msg.from.endsWith('@c.us')){
+        if (msg.body.match (/saber mais sobre o chatbot/i) && msg.from.endsWith('@c.us')){
             const chat = await msg.getChat();
             const contact = await msg.getContact();
             const nome = contact.pushname;
@@ -64,8 +64,30 @@ const client = new Client ({
             await chat.sendStateTyping();
             await delay (3000);
             await client.sendMessage(msg.from, logo, {caption:'🙋‍♂️ *Olá* ' + nome.split(' ')[0] + '! ' + hora() + '\nSou o 🤖 *Zaapy,* atendente virtual da *ZAP Botics.*\n_Como posso ajudar?_\n\nEscolha o *NÚMERO* de uma das opções abaixo. 👇\n\n1️⃣ - Preciso de um *CHATBOT*\n2️⃣ - O que é um *CHATBOT?*\n3️⃣ - Acompanhar projeto\n4️⃣ - Assistência técnica 24hs'});
-        }; 
-        if (msg.body === "1") {
+       
+        };  if (msg.body === "Bot"){
+            const chat = await msg.getChat();
+            const contact = await msg.getContact();
+            const nome = contact.pushname;
+            const logo = MessageMedia.fromFilePath('./LOGO.jpg');
+            await delay(3000);
+            await chat.sendStateTyping();
+            await delay (3000);
+            await client.sendMessage(msg.from, logo, {caption:'🙋‍♂️ *Olá* ' + nome.split(' ')[0] + '! ' + hora() + '\nSou o 🤖 *Zaapy,* atendente virtual da *ZAP Botics.*\n_Como posso ajudar?_\n\nEscolha o *NÚMERO* de uma das opções abaixo. 👇\n\n1️⃣ - Preciso de um *CHATBOT*\n2️⃣ - O que é um *CHATBOT?*\n3️⃣ - Acompanhar projeto\n4️⃣ - Assistência técnica 24hs'});
+       
+        } 
+            else if (msg.body === "bot"){
+            const chat = await msg.getChat();
+            const contact = await msg.getContact();
+            const nome = contact.pushname;
+            const logo = MessageMedia.fromFilePath('./LOGO.jpg');
+            await delay(3000);
+            await chat.sendStateTyping();
+            await delay (3000);
+            await client.sendMessage(msg.from, logo, {caption:'🙋‍♂️ *Olá* ' + nome.split(' ')[0] + '! ' + hora() + '\nSou o 🤖 *Zaapy,* atendente virtual da *ZAP Botics.*\n_Como posso ajudar?_\n\nEscolha o *NÚMERO* de uma das opções abaixo. 👇\n\n1️⃣ - Preciso de um *CHATBOT*\n2️⃣ - O que é um *CHATBOT?*\n3️⃣ - Acompanhar projeto\n4️⃣ - Assistência técnica 24hs'});
+       
+        } 
+        else if (msg.body === "1") {
             const chat = await msg.getChat();
             await delay (3000);
             await chat.sendStateTyping();
