@@ -1,7 +1,10 @@
 const qrcode = require ('qrcode-terminal');
-const {Client, LocalAuth, List, Buttons, MessageTypes, MessageMedia} = require ('whatsapp-web.js');
-const client = new Client ({
-    authStrategy: new LocalAuth()
+const {Client, List, Buttons, MessageTypes, MessageMedia} = require ('whatsapp-web.js');
+const client = new Client({
+    puppeteer: {
+        headless: true, // Para executar sem interface gráfica
+        args: ['--no-sandbox', '--disable-setuid-sandbox'] // Flags de sandboxing para ambientes sem GUI
+    }
 });
     client.on('qr', qr => {
         qrcode.generate(qr, {small: true});
