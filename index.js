@@ -96,7 +96,7 @@ const client = new Client({
             await chat.sendStateTyping();
             await delay(3000);
             await client.sendMessage(msg.from, '😃 *Maravilha!*\n\nQual é a modalidade da sua empresa?');
-            await delay (10000);
+            await delay (30000);
             await chat.sendStateTyping();
             await delay(3000);
             await client.sendMessage(msg.from, '😉 *Vou te explicar os próximos passos.*\n\n➡️ Primeiro vamos criar um fluxo de atendimento pra o seu *CHATBOT* junto a você.\n\n➡️ Fluxo criado, vamos partir para a fase de desenvolvimento, este processo é bastante trabalhoso e pode levar até duas semanas dependendo do seu fluxo de atendimento.\n\n➡️ Após este processo vamos começar os testes para sua aprovação.\n\n➡️ *CHATBOT* aprovado, iremos implantar em um servidor virtual para que escaneie o *QRCODE* e pronto. *BOT* 🤖 em funcionamento!');
