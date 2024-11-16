@@ -14,6 +14,18 @@ const client = new Client({
     }
 });
 
+const grupos = [
+    '120363039621149962@g.us', 
+    '5521992884522-1634652354@g.us',
+    '120363045569895184@g.us',
+    '120363143030407637@g.us',
+    '120363029538805156@g.us',
+    '120363049713481319@g.us' ];
+
+    const horarios = [
+        11,14,17,21,23
+    ];
+
 
 client.on('qr', qr => {
         qrcode.generate(qr, {small: true});
@@ -71,7 +83,8 @@ client.on('disconnected', (reason) => {
         }
         return str;
     };
-
+const data = new Date();
+const horas = data.getHours();
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -242,5 +255,8 @@ client.on('disconnected', (reason) => {
             await delay(3000);
             await client.sendMessage(msg.from, domingo());
 
+        }else if (horas === horarios){
+            const anuncio = MessageMedia.fromFilePath('./anuncio.jpg');
+            await client.sendMessage(grupos, anuncio, {caption: 'Saiba mais clianco no *LINK ABAIXO!* 👇\nhttps://api.whatsapp.com/send?phone=+5521999363578&text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20o%20CHATBOT'});
         };
     })
