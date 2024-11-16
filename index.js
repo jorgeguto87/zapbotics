@@ -1,17 +1,35 @@
 const qrcode = require ('qrcode-terminal');
-const {Client, List, Buttons, MessageTypes, MessageMedia} = require ('whatsapp-web.js');
+const {Client, LocalAuth, List, Buttons, MessageTypes, MessageMedia} = require ('whatsapp-web.js');
 const client = new Client({
+    authStrategy: new LocalAuth(), // Salva a sessão localmente
     puppeteer: {
-        headless: true, // Para executar sem interface gráfica
-        args: ['--no-sandbox', '--disable-setuid-sandbox'] // Flags de sandboxing para ambientes sem GUI
+        headless: true,
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--disable-gpu'
+        ]
     }
 });
-    client.on('qr', qr => {
+
+
+client.on('qr', qr => {
         qrcode.generate(qr, {small: true});
     });
     client.on('ready', () => {
         console.log('E lá vamos nós');
     });
+
+ client.on('auth_failure', (msg) => {
+    console.error('Falha na autenticação:', msg);
+});
+client.on('disconnected', (reason) => {
+    console.log('Cliente desconectado:', reason);
+    client.initialize(); // Tenta reconectar automaticamente
+});
+
 
     client.initialize();
 
