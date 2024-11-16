@@ -83,8 +83,7 @@ client.on('disconnected', (reason) => {
         }
         return str;
     };
-const data = new Date();
-const horas = data.getHours();
+
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -255,8 +254,28 @@ const horas = data.getHours();
             await delay(3000);
             await client.sendMessage(msg.from, domingo());
 
-        }else if (horas === horarios){
-            const anuncio = MessageMedia.fromFilePath('./anuncio.jpg');
-            await client.sendMessage(grupos, anuncio, {caption: 'Saiba mais clianco no *LINK ABAIXO!* 👇\nhttps://api.whatsapp.com/send?phone=+5521999363578&text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20o%20CHATBOT'});
         };
-    })
+        async function verificarEEnviarMensagem() {
+    const data = new Date();
+    const horas = data.getHours();
+
+    if (horarios.includes(horas)) {
+        const anuncio = MessageMedia.fromFilePath('./anuncio.jpg');
+        const mensagem = 'Saiba mais clicando no *LINK ABAIXO!* 👇\nhttps://api.whatsapp.com/send?phone=+5521999363578&text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20o%20CHATBOT';
+
+        // Itera sobre os grupos e envia a mensagem
+        for (const grupo of grupos) {
+            try {
+                await client.sendMessage(grupo, anuncio, { caption: mensagem });
+                console.log(`Mensagem enviada para o grupo: ${grupo}`);
+            } catch (error) {
+                console.error(`Erro ao enviar mensagem para o grupo ${grupo}:`, error);
+            }
+        }
+    }
+}
+
+// Chamar a função periodicamente (por exemplo, a cada minuto)
+setInterval(verificarEEnviarMensagem, 60 * 1000);
+        
+    });
