@@ -77,7 +77,7 @@ client.on('disconnected', (reason) => {
         const dia = data.getDay();
         let str = '';
         if (dia === 0){
-            str = '🏖️ *Aproveite o fime de semana!*\n\n😉 Segunda feira nos falamos assim que retomarmos nossas atividades.\n\n🕗 _Nosso horário de atendimento é de segunda a sábado das 08:00hs às 20:00hs._\n\n👋 *Até mais!*';
+            str = '🏖️ *Aproveite o fim de semana!*\n\n😉 Segunda feira nos falamos assim que retomarmos nossas atividades.\n\n🕗 _Nosso horário de atendimento é de segunda a sábado das 08:00hs às 20:00hs._\n\n👋 *Até mais!*';
         } else {
             str = atende();
         }
