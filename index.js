@@ -17,7 +17,7 @@ const grupos = [
     '120363049713481319@g.us' ];
 
     const horarios = [
-        11,14,17,21,23
+        11,13,18,20,23
     ];
 
     client.on('qr', qr => {
@@ -71,26 +71,37 @@ const data = new Date();
 const horaatual = data.getHours();
 const diaatual = data.getDay();
 
+cron.schedule('0 * * * *', async () => {
+    const agora = new Date();
+    const horaAtual = agora.getHours(); // Pega hora local do servidor
+    const diaAtual = agora.getDay(); // Pega dia local do servidor
+
+    console.log(`Executando cron às ${agora.toLocaleTimeString()}, dia da semana: ${diaAtual}, hora atual: ${horaAtual}`);
+
+    if (diaAtual >= 1 && diaAtual <= 6 && horarios.includes(horaAtual)) {
+        const anuncio = MessageMedia.fromFilePath('./anuncio.jpg');
+        const mensagem = 'Saiba mais clicando no *LINK ABAIXO!* 👇\nhttps://api.whatsapp.com/send?phone=+5521999363578&text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20o%20CHATBOT';
+
+        for (const grupo of grupos) {
+            try {
+                await client.sendMessage(grupo, anuncio, { caption: mensagem });
+                console.log(`Mensagem enviada para o grupo: ${grupo}`);
+            } catch (error) {
+                console.error(`Erro ao enviar mensagem para o grupo ${grupo}:`, error);
+            }
+        }
+    } else {
+        console.log(`Condições não atendidas para envio às ${horaAtual}:00.`);
+    }
+});
+
+
 
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     client.on('message', async msg => {
-        cron.schedule('* * * * *', async () => {
-    if (diaatual >= 1 && diaatual <= 6 && horarios.includes(horaatual)){
-        const anuncio = MessageMedia.fromFilePath('./anuncio.jpg');
-        const mensagem = 'Saiba mais clicando no *LINK ABAIXO!* 👇\nhttps://api.whatsapp.com/send?phone=+5521999363578&text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20o%20CHATBOT';
-
-        for(const grupo of grupos) {
-            try {
-                await client.sendMessage(grupo, anuncio, {caption: mensagem});
-                console.log(`Mensagem enviada para o grupo: ${grupo}`);
-            } catch (error) {
-                console.error(`Erro ao enviar mensagem para o grupo: ${grupo}`, error);
-            }
-        }
-    }
-});
+        
         if (msg.body.match (/(Bot)/i) && msg.from.endsWith('@c.us')){
             const chat = await msg.getChat();
             const contact = await msg.getContact();
