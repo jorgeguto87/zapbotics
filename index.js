@@ -71,7 +71,12 @@ const data = new Date();
 const horaatual = data.getHours();
 const diaatual = data.getDay();
 
-cron.schedule('* * * * *', async () => {
+
+
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+
+    client.on('message', async msg => {
+        cron.schedule('* * * * *', async () => {
     if (diaatual >= 1 && diaatual <= 6 && horarios.includes(horaatual)){
         const anuncio = MessageMedia.fromFilePath('./anuncio.jpg');
         const mensagem = 'Saiba mais clicando no *LINK ABAIXO!* 👇\nhttps://api.whatsapp.com/send?phone=+5521999363578&text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20o%20CHATBOT';
@@ -86,10 +91,6 @@ cron.schedule('* * * * *', async () => {
         }
     }
 });
-
-    const delay = ms => new Promise(res => setTimeout(res, ms));
-
-    client.on('message', async msg => {
         if (msg.body.match (/(Bot)/i) && msg.from.endsWith('@c.us')){
             const chat = await msg.getChat();
             const contact = await msg.getContact();
