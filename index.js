@@ -1,18 +1,12 @@
 const qrcode = require ('qrcode-terminal');
 const {Client, LocalAuth, List, Buttons, MessageTypes, MessageMedia} = require ('whatsapp-web.js');
-const client = new Client({
-    authStrategy: new LocalAuth(), // Salva a sessão localmente
-    puppeteer: {
-        headless: true,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--disable-gpu'
-        ]
-    }
+const client = new Client ({
+    authStrategy: new LocalAuth()
+
 });
+
+const cron = require('node-cron');
+const fs = require ('fs');
 
 const grupos = [
     '120363039621149962@g.us', 
@@ -26,22 +20,12 @@ const grupos = [
         11,14,17,21,23
     ];
 
-
-client.on('qr', qr => {
+    client.on('qr', qr => {
         qrcode.generate(qr, {small: true});
     });
     client.on('ready', () => {
         console.log('E lá vamos nós');
     });
-
- client.on('auth_failure', (msg) => {
-    console.error('Falha na autenticação:', msg);
-});
-client.on('disconnected', (reason) => {
-    console.log('Cliente desconectado:', reason);
-    client.initialize(); // Tenta reconectar automaticamente
-});
-
 
     client.initialize();
 
@@ -49,9 +33,9 @@ client.on('disconnected', (reason) => {
         const data = new Date();
         const hora = data.getHours();
         let str = '';
-        if (hora >= 8 && hora < 15){
+        if (hora >= 5 && hora < 12){
             str = '*Bom dia!*';
-        }else if (hora >= 15 && hora < 21){
+        }else if (hora >= 12 && hora < 18){
             str = '*Boa tarde!*';
         }else{
             str = '*Boa noite!*';
@@ -63,7 +47,7 @@ client.on('disconnected', (reason) => {
         const data = new Date();
         const hora = data.getHours();
         let str = '';
-        if (hora >= 11 && hora < 23){
+        if (hora >= 8 && hora < 20){
             str = '😃 *Aguarde um momento que logo será atendido!*';
         }else{
             str = '😕 *Poxa, já estamos fora do horário de atendimento!*\n\n😃 Mas não fique triste, assim que retomarmos nossas atividades, falar com você será nossa prioridade.\n\n\🕗 _Nosso horário de atendimento é de segunda a sábado das 08:00hs às 20:00hs._\n\n👋 *Até mais!*';
@@ -77,18 +61,36 @@ client.on('disconnected', (reason) => {
         const dia = data.getDay();
         let str = '';
         if (dia === 0){
-            str = '🏖️ *Aproveite o fim de semana!*\n\n😉 Segunda feira nos falamos assim que retomarmos nossas atividades.\n\n🕗 _Nosso horário de atendimento é de segunda a sábado das 08:00hs às 20:00hs._\n\n👋 *Até mais!*';
+            str = '🏖️ *Aproveite o fime de semana!*\n\n😉 Segunda feira nos falamos assim que retomarmos nossas atividades.\n\n🕗 _Nosso horário de atendimento é de segunda a sábado das 08:00hs às 20:00hs._\n\n👋 *Até mais!*';
         } else {
             str = atende();
         }
         return str;
     };
+const data = new Date();
+const horaatual = data.getHours();
+const diaatual = data.getDay();
 
+cron.schedule('* * * * *', async () => {
+    if (diaatual >= 1 && diaatual <= 6 && horarios.includes(horaatual)){
+        const anuncio = MessageMedia.fromFilePath('./anuncio.jpg');
+        const mensagem = 'Saiba mais clicando no *LINK ABAIXO!* 👇\nhttps://api.whatsapp.com/send?phone=+5521999363578&text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20o%20CHATBOT';
+
+        for(const grupo of grupos) {
+            try {
+                await client.sendMessage(grupo, anuncio, {caption: mensagem});
+                console.log(`Mensagem enviada para o grupo: ${grupo}`);
+            } catch (error) {
+                console.error(`Erro ao enviar mensagem para o grupo: ${grupo}`, error);
+            }
+        }
+    }
+});
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     client.on('message', async msg => {
-        if (msg.body.match (/saber mais sobre o chatbot/i) && msg.from.endsWith('@c.us')){
+        if (msg.body.match (/(Bot)/i) && msg.from.endsWith('@c.us')){
             const chat = await msg.getChat();
             const contact = await msg.getContact();
             const nome = contact.pushname;
@@ -97,36 +99,14 @@ client.on('disconnected', (reason) => {
             await chat.sendStateTyping();
             await delay (3000);
             await client.sendMessage(msg.from, logo, {caption:'🙋‍♂️ *Olá* ' + nome.split(' ')[0] + '! ' + hora() + '\nSou o 🤖 *Zaapy,* atendente virtual da *ZAP Botics.*\n_Como posso ajudar?_\n\nEscolha o *NÚMERO* de uma das opções abaixo. 👇\n\n1️⃣ - Preciso de um *CHATBOT*\n2️⃣ - O que é um *CHATBOT?*\n3️⃣ - Acompanhar projeto\n4️⃣ - Assistência técnica 24hs'});
-       
-        };  if (msg.body === "Bot"){
-            const chat = await msg.getChat();
-            const contact = await msg.getContact();
-            const nome = contact.pushname;
-            const logo = MessageMedia.fromFilePath('./LOGO.jpg');
-            await delay(3000);
-            await chat.sendStateTyping();
-            await delay (3000);
-            await client.sendMessage(msg.from, logo, {caption:'🙋‍♂️ *Olá* ' + nome.split(' ')[0] + '! ' + hora() + '\nSou o 🤖 *Zaapy,* atendente virtual da *ZAP Botics.*\n_Como posso ajudar?_\n\nEscolha o *NÚMERO* de uma das opções abaixo. 👇\n\n1️⃣ - Preciso de um *CHATBOT*\n2️⃣ - O que é um *CHATBOT?*\n3️⃣ - Acompanhar projeto\n4️⃣ - Assistência técnica 24hs'});
-       
-        } 
-            else if (msg.body === "bot"){
-            const chat = await msg.getChat();
-            const contact = await msg.getContact();
-            const nome = contact.pushname;
-            const logo = MessageMedia.fromFilePath('./LOGO.jpg');
-            await delay(3000);
-            await chat.sendStateTyping();
-            await delay (3000);
-            await client.sendMessage(msg.from, logo, {caption:'🙋‍♂️ *Olá* ' + nome.split(' ')[0] + '! ' + hora() + '\nSou o 🤖 *Zaapy,* atendente virtual da *ZAP Botics.*\n_Como posso ajudar?_\n\nEscolha o *NÚMERO* de uma das opções abaixo. 👇\n\n1️⃣ - Preciso de um *CHATBOT*\n2️⃣ - O que é um *CHATBOT?*\n3️⃣ - Acompanhar projeto\n4️⃣ - Assistência técnica 24hs'});
-       
-        } 
-        else if (msg.body === "1") {
+        }; 
+        if (msg.body === "1") {
             const chat = await msg.getChat();
             await delay (3000);
             await chat.sendStateTyping();
             await delay(3000);
             await client.sendMessage(msg.from, '😃 *Maravilha!*\n\nQual é a modalidade da sua empresa?');
-            await delay (30000);
+            await delay (10000);
             await chat.sendStateTyping();
             await delay(3000);
             await client.sendMessage(msg.from, '😉 *Vou te explicar os próximos passos.*\n\n➡️ Primeiro vamos criar um fluxo de atendimento pra o seu *CHATBOT* junto a você.\n\n➡️ Fluxo criado, vamos partir para a fase de desenvolvimento, este processo é bastante trabalhoso e pode levar até duas semanas dependendo do seu fluxo de atendimento.\n\n➡️ Após este processo vamos começar os testes para sua aprovação.\n\n➡️ *CHATBOT* aprovado, iremos implantar em um servidor virtual para que escaneie o *QRCODE* e pronto. *BOT* 🤖 em funcionamento!');
@@ -255,27 +235,6 @@ client.on('disconnected', (reason) => {
             await client.sendMessage(msg.from, domingo());
 
         };
-        async function verificarEEnviarMensagem() {
-    const data = new Date();
-    const horas = data.getHours();
-
-    if (horarios.includes(horas)) {
-        const anuncio = MessageMedia.fromFilePath('./anuncio.jpg');
-        const mensagem = 'Saiba mais clicando no *LINK ABAIXO!* 👇\nhttps://api.whatsapp.com/send?phone=+5521999363578&text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20o%20CHATBOT';
-
-        // Itera sobre os grupos e envia a mensagem
-        for (const grupo of grupos) {
-            try {
-                await client.sendMessage(grupo, anuncio, { caption: mensagem });
-                console.log(`Mensagem enviada para o grupo: ${grupo}`);
-            } catch (error) {
-                console.error(`Erro ao enviar mensagem para o grupo ${grupo}:`, error);
-            }
-        }
-    }
-}
-
-// Chamar a função periodicamente (por exemplo, a cada minuto)
-setInterval(verificarEEnviarMensagem, 60 * 1000);
         
     });
+    
