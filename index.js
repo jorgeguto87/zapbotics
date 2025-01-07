@@ -102,7 +102,7 @@ cron.schedule('0 * * * *', async () => {
 
     client.on('message', async msg => {
         
-        if (msg.body.match (/(Bot)/i) && msg.from.endsWith('@c.us')){
+        if (msg.body.includes('CHATBOT') && msg.from.endsWith('@c.us')){
             const chat = await msg.getChat();
             const contact = await msg.getContact();
             const nome = contact.pushname;
